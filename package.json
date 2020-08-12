@@ -1,0 +1,25 @@
+{
+  "name": "resourceapp",
+  "version": "1.0.0",
+  "description": "app",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TGY-forture/resource-app.git"
+  },
+  "keywords": [
+    "resource"
+  ],
+  "author": "TGY",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TGY-forture/resource-app/issues"
+  },
+  "homepage": "https://github.com/TGY-forture/resource-app#readme",
+  "dependencies": {
+    "uview-ui": "^1.6.0"
+  }
+}
