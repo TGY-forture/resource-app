@@ -2,9 +2,8 @@
 	"easycom": {
 		"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
 	},
-	"pages": [
-		{
-			"path": "pages/log/log"
+	"pages": [{
+			"path": "pages/index/index"
 		},
 		{
 			"path": "pages/manage/manage"
@@ -13,37 +12,42 @@
 			"path": "pages/user/user"
 		},
 		{
+			"path": "pages/log/log"
+		},
+		{
 			"path": "pages/sign/sign"
 		},
 		{
-			"path": "pages/index/index"
+			"path": "pages/record/record"
+		},
+		{
+			"path": "pages/search/search"
 		}
-	],
+    ],
 	"tabBar": {
-	    "color": "#7A7E83",
-	    "selectedColor": "#1296db",
-	    "borderStyle": "white",
-	    "backgroundColor": "#ffffff",
-	    "list": [
-				{
-	        "pagePath": "pages/log/log",
-	        "iconPath": "static/img/home.png",
-	        "selectedIconPath": "static/img/homes.png",
-	        "text": "首页"
-				},
-				{
-	        "pagePath": "pages/manage/manage",
-	        "iconPath": "static/img/manage.png",
-	        "selectedIconPath": "static/img/manages.png",
-	        "text": "管理"
-				},
-				{
-					"pagePath": "pages/user/user",
-					"iconPath": "static/img/person.png",
-					"selectedIconPath": "static/img/persons.png",
-					"text": "我的"
-				}
-			]
+		"color": "#7A7E83",
+		"selectedColor": "#1296db",
+		"borderStyle": "white",
+		"backgroundColor": "#ffffff",
+		"list": [{
+				"pagePath": "pages/index/index",
+				"iconPath": "static/img/home.png",
+				"selectedIconPath": "static/img/homes.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/manage/manage",
+				"iconPath": "static/img/manage.png",
+				"selectedIconPath": "static/img/manages.png",
+				"text": "管理"
+			},
+			{
+				"pagePath": "pages/user/user",
+				"iconPath": "static/img/person.png",
+				"selectedIconPath": "static/img/persons.png",
+				"text": "我的"
+			}
+		]
 	},
 	"globalStyle": {
 		"navigationStyle": "custom"
