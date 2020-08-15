@@ -3,22 +3,22 @@
 		<view class="nav-bar">
 			<view class="status-bar"></view>
 			<view class="content">
-				<u-icon name="Larrow" custom-prefix="custom-icon" size="50" color="white"></u-icon>
+				<u-icon name="Larrow" custom-prefix="custom-icon" size="50" color="white" @click="back"></u-icon>
 				<span>注册</span>
 			</view>
 		</view>
-		<view class="sign-info" v-if="true">
+		<view class="sign-info" v-if="visible">
 			<p>请输入电话号码</p>
 			<view class="phone">
 				<span>+86</span>
-				<input type="text">
+				<input type="text" v-model="phone">
 			</view>
 			<u-button type="primary" @click="sendCapcha">下一步</u-button>
 		</view>
-		<view class="sign-capcha" v-if="true">
+		<view class="sign-capcha" v-else>
 			<p>请输入验证码</p>
-			<u-message-input mode="box" :focus="false" @finish="finish"></u-message-input>
-			<u-button style="margin-top: 20px" type="primary" @click="setPass">下一步</u-button>
+			<u-message-input mode="box" :focus="true" @finish="finish"></u-message-input>
+			<!-- <u-button style="margin-top: 20px" type="primary" @click="setPass">下一步</u-button> -->
 		</view>
 		<u-popup 
 			class="pass-pop" v-model="show" mode="center" 
@@ -26,8 +26,8 @@
 		>
 			<p>请设置你的密码</p>
 			<u-field 
-				label="密码" type="password" icon="lock" 
-				right-icon="eye" :clearable="false"
+				label="密码" :type="type" icon="lock" v-model="password" placeholder="八位数字英文及字符"
+				right-icon="eye" :clearable="false" @right-icon-click="flag = !flag"
 			>	
 			</u-field>
 			<u-button class="pass-save" type="default" size="medium" @click="save">保存</u-button>
@@ -39,27 +39,93 @@
 	export default {
 		data() {
 			return {
-				show: false
+				phone: '',
+				password: '',
+				capcha: '',
+				show: false,
+				visible: true,
+				flag: false
 			};
 		},
+		computed: {
+			type() {
+				return this.flag ? 'text' : 'password'
+			}
+		},
 		methods: {
-			finish(e) {
-				console.log(e)
+			back() {
+				uni.navigateBack({
+					url: '../log/log'
+				})
 			},
-			setPass() {
-				this.show = true;
+			finish(val) {
+				if (val === this.capcha) {
+					this.show = true
+				}
 			},
 			save() {
-				
+				const passreg = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[\W]).{8}$/;
+				if (passreg.test(this.password)) {
+					uni.request({
+						url: 'http://10.145.226.11:3000/sign',
+						method: 'POST',
+						data: { phone: this.phone, password: this.password },
+						success: (res) => {
+							let icon = 'none';
+							let title = '';
+							if (res.data === 'ok') {
+								icon = 'success';
+								title = '注册成功';
+								this.show = false;
+								uni.navigateBack({
+									url: '../log/log'
+								})
+							} else {
+								title = '注册失败'
+							}
+							uni.showToast({
+								icon,
+								title
+							})
+						}
+					})
+				} else {
+					uni.showToast({
+						title: '密码不符合要求',
+						position: 'top'
+					})
+				}
 			},
 			sendCapcha() {
-				uni.request({
-					url: 'http://10.145.226.11:3000/index',
-					method: 'GET',
-					success(res) {
-						console.log(res.data)
-					}
-				})
+				const usereg = /^[0-9]{11}$/;
+				if (usereg.test(this.phone)) {
+					uni.showLoading({
+						title: '校验中...'
+					});
+					uni.request({
+						url: 'http://10.145.226.11:3000/sign',
+						method: 'GET',
+						data: { phone: this.phone },
+						success: (res) => {
+							let icon = 'none';
+							let title = '';
+							if (res.data === 'fail') {
+								title = '验证码发送失败';
+							} else if (res.data === 'same') {
+								title = '用户名已存在';
+							} else {
+								title = '验证码发送成功';
+								icon = 'success';
+								this.visible = false;
+								this.capcha = res.data.toString();
+							}
+							uni.showToast({
+								icon,
+								title
+							})
+						}
+					})
+				}
 			}
 		}
 	}

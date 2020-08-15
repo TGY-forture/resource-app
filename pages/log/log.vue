@@ -4,14 +4,14 @@
 		<img class="hammer" src="static/img/hammer.png" alt="logo">
 		<h2 style="text-align: center;">欢迎使用溯源信息平台App</h2>
 		<view class="log-inp">
-			<input type="text" placeholder="用户名">
+			<input type="text" v-model="username" placeholder="用户名">
 			<u-icon class="icon" custom-prefix="custom-icon" color="#b2bec3" name="user" size="40"></u-icon>
-			<u-icon class="icon-after" color="#b2bec3" name="close-circle-fill" size="40"></u-icon>
+			<u-icon class="icon-after" v-show="comUser" color="#b2bec3" name="close-circle-fill" size="40" @click="username = ''"></u-icon>
 		</view>
 		<view class="log-inp">
-			<input type="password" placeholder="密码">
+			<input :type="type" v-model="password" placeholder="密码">
 			<u-icon class="icon" custom-prefix="custom-icon" color="#b2bec3" name="lock" size="40"></u-icon>
-			<u-icon class="icon-after" color="#b2bec3" name="eye" size="40"></u-icon>
+			<u-icon class="icon-after" color="#b2bec3" name="eye" size="40" @click="flag = !flag"></u-icon>
 		</view>
 		<view class="log-act" @tap="log">
 			<u-icon name="arrow-rightward" color="white" size="70"></u-icon>
@@ -28,22 +28,60 @@
 	export default {
 		data() {
 			return {
-				
+				username: '18361812729',
+				password: 'tgy1234.',
+				flag: true
 			};
+		},
+		computed: {
+			comUser() {
+				return this.username ? true : false
+			},
+			type() {
+				return this.flag ? 'password' : 'text'
+			}
 		},
 		methods: {
 			log() {
-				uni.showLoading({
-					title: '正在登陆',
-					mask: true
-				});
-				setTimeout(() => {
-					uni.hideLoading();
-					uni.showToast({
-						title: '登陆成功',
-						icon: 'success'
+				const usereg = /^[0-9]{11}$/;
+				const passreg = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[\W]).{8}$/;
+				if (usereg.test(this.username) && passreg.test(this.password)) {
+					uni.showLoading({
+						title: '正在检验...',
+						mask: true
+					});
+					uni.request({
+						url: 'http://10.145.226.11:3000/log',
+						data: {
+							username: this.username,
+							password: this.password
+						},
+						method: 'POST',
+						dataType: 'json',
+						success: (res) => {
+							let title = '';
+							let icon = 'none';
+							if (res.data === 'success') {
+								title = '登录成功';
+								icon = 'success';
+								getApp().globalData.username = this.username;
+								uni.switchTab({
+									url: '../index/index'
+								})
+							} else if (res.data === 'empty') {
+								title = '该用户不存在';
+							} else if (res.data === 'active') {
+								title = '该用户已登录';
+							} else if (res.data === 'fail') {
+							  title = '用户名或密码错误';
+							}
+							uni.showToast({
+								title,
+								icon
+							})
+						}
 					})
-				}, 2000)
+				}
 			},
 			toSign() {
 				uni.navigateTo({
@@ -57,19 +95,23 @@
 <style lang="scss">
 	#log {
 		width: 750rpx;
+
 		.status-bar {
 			height: var(--status-bar-height);
 		}
+
 		.hammer {
 			display: block;
 			width: 200rpx;
 			height: 200rpx;
 			margin: 20px auto;
 		}
+
 		.log-inp {
 			width: 600rpx;
 			position: relative;
 			margin: 40px auto;
+
 			input {
 				border: 1px solid #dfe6e9;
 				text-align: center;
@@ -82,17 +124,19 @@
 				font-size: 20px;
 				letter-spacing: 2px;
 				box-shadow: 2px 2px 10px 2px #dfe6e9,
-										2px -2px 10px 2px #dfe6e9,
-										-2px 2px 10px 2px #dfe6e9,
-										-2px -2px 10px 2px #dfe6e9;
-				
+					2px -2px 10px 2px #dfe6e9,
+					-2px 2px 10px 2px #dfe6e9,
+					-2px -2px 10px 2px #dfe6e9;
+
 			}
+
 			.icon {
 				position: absolute;
 				top: 50%;
 				left: 10px;
 				transform: translateY(-50%);
 			}
+
 			.icon-after {
 				position: absolute;
 				top: 50%;
@@ -100,6 +144,7 @@
 				transform: translateY(-50%);
 			}
 		}
+
 		.log-act {
 			width: 70px;
 			height: 70px;
@@ -110,6 +155,7 @@
 			align-items: center;
 			justify-content: center;
 		}
+
 		.bot-mes {
 			margin: 60px auto 0;
 			display: flex;

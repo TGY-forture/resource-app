@@ -8,13 +8,13 @@
 			<!-- http://10.145.226.11:3000/img/avatar.jpeg -->
 			<view class="user-basic">
 				<u-avatar 
-					src=""
-					size="large" show-sex sex-icon="man"
+					:src="avatar"
+					size="large" show-sex :sex-icon="gender"
 				>
 				</u-avatar>
 				<view class="text-name">
-					<p>环境大幅度发四大皆空</p>
-					<p>胡富国</p>
+					<p>{{nickname}}</p>
+					<p>{{name}}</p>
 				</view>
 			</view>
 			<view class="user-tips">
@@ -23,7 +23,7 @@
 			</view>
 		</view>
 		<view class="user-mid">
-			<view v-for="item in infodata" :key="item.name" class="item-cell" @click="show(item.name)">
+			<view v-for="item in infodata" :key="item.name" class="item-cell" @click="show(item)">
 				<u-icon custom-prefix="custom-icon" :name="item.name" size="60" color="#5290FF"></u-icon>
 				<p>{{item.text}}</p>
 			</view>
@@ -32,12 +32,16 @@
 			</view>
 		</view>
 		<view class="user-bot">
-			<u-button type="error" size="medium">退出登录</u-button>
+			<u-button type="error" size="medium" @click="logout">退出登录</u-button>
 		</view>
+		<u-modal v-model="sight" :title="title" :show-confirm-button="false" :mask-close-able="true">
+			<p style="margin: 10px 0;text-align: center">{{text}}</p>
+		</u-modal>
 	</view>
 </template>
 
 <script>
+	import {mapState, mapGetters} from 'vuex'
 	const infodata = [
 		{
 			name: 'name',
@@ -71,12 +75,42 @@
 	export default {
 		data() {
 			return {
-				infodata
+				infodata,
+				sight: false,
+				text: '',
+				title: ''
 			};
+		},
+		computed: {
+			...mapState(['avatar', 'copyinfo']),
+			...mapGetters(['name', 'nickname', 'gender'])
+		},
+		onHide() {
+			this.sight = false
 		},
 		methods: {
 			show(val) {
-				console.log(val)
+				let key;
+				switch(val.name) {
+					case 'name': key = 'name'; break
+					case 'yonghuming': key = 'username'; break
+					case 'age': key = 'age'; break
+					case 'Verifiedgender': key = 'sex'; break
+					case 'xiugainicheng': key = 'nickname'; break
+					case 'CompanyPages': key = 'company'; break
+					case 'Email': key = 'email'; break
+					default: break
+				}
+				this.title = val.text;
+				this.text = this.copyinfo[key];
+				this.sight = true;
+			},
+			logout() {
+				if(this.copyinfo.username) {
+					uni.request({
+						
+					})
+				}
 			}
 		}
 	}

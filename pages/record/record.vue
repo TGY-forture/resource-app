@@ -175,7 +175,7 @@
 						.list-menu-item {
 							display: flex;
 							margin: 15px 0;
-
+							align-items: center;
 							p {
 								margin-left: 16px;
 							}

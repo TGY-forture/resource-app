@@ -2,7 +2,7 @@
 	<view id="index">
 		<status-bar />
 		<view class="index-mid">
-			<u-swiper :list="list" border-radius="10" img-mode="center"></u-swiper>
+			<u-swiper :list="list" border-radius="10" duration="1000" :interval="4000" img-mode="aspectFit"></u-swiper>
 			<p class="index-mes">
 				欢迎使用溯源信息平台软件，如果你是员工，你可以在这里管理公司产品信息，如果你是用户，你可以查询购买的产品信息。
 			</p>
@@ -17,16 +17,17 @@
 </template>
 
 <script>
+	import { mapMutations, mapActions } from 'vuex'
 	import StatusBar from '@/components/statusbar/statusbar.vue'
 	const list = [
 		{
-			image: '../../static/img/home.png'
+			image: '../../static/img/wa.png'
 		},
 		{
-			image: '../../static/img/home.png'
+			image: '../../static/img/ka.png'
 		},
 		{
-			image: '../../static/img/home.png'
+			image: '../../static/img/chan.png'
 		}
 	]
 	export default {
@@ -34,6 +35,20 @@
 			return {
 				list
 			}
+		},
+		beforeCreate() {
+			const username = getApp().globalData.username;
+			uni.request({
+				url: 'http://10.145.226.11:3000/log',
+				data: { username },
+				method: 'GET',
+				success: (res) => {
+					if (res.data !== 'fail') {
+						this.initUserinfo(res.data);
+						this.getAvatar();
+					}
+				}
+			})
 		},
 		components: {
 			StatusBar
@@ -43,7 +58,9 @@
 				uni.navigateTo({
 					url: '../log/log'
 				})
-			}
+			},
+			...mapMutations(['initUserinfo']),
+			...mapActions(['getAvatar', 'getCompanyinfo'])
 		}
 	}
 </script>
