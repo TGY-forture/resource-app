@@ -25,6 +25,7 @@
 </template>
 
 <script>
+	import { mapMutations, mapActions } from 'vuex'
 	export default {
 		data() {
 			return {
@@ -42,6 +43,8 @@
 			}
 		},
 		methods: {
+			...mapMutations(['initUserinfo']),
+			...mapActions(['getAvatar']),
 			log() {
 				const usereg = /^[0-9]{11}$/;
 				const passreg = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[\W]).{8}$/;
@@ -64,7 +67,18 @@
 							if (res.data === 'success') {
 								title = '登录成功';
 								icon = 'success';
-								getApp().globalData.username = this.username;
+								uni.setStorageSync('username', this.username)
+								uni.request({
+									url: 'http://10.145.226.11:3000/log',
+									data: { username: this.username },
+									method: 'GET',
+									success: (res) => {
+										if (res.data !== 'fail') {
+											this.initUserinfo(res.data);
+											this.getAvatar();
+										}
+									}
+								});
 								uni.switchTab({
 									url: '../index/index'
 								})

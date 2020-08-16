@@ -18,7 +18,6 @@
 		<view class="sign-capcha" v-else>
 			<p>请输入验证码</p>
 			<u-message-input mode="box" :focus="true" @finish="finish"></u-message-input>
-			<!-- <u-button style="margin-top: 20px" type="primary" @click="setPass">下一步</u-button> -->
 		</view>
 		<u-popup 
 			class="pass-pop" v-model="show" mode="center" 

@@ -17,7 +17,6 @@
 </template>
 
 <script>
-	import { mapMutations, mapActions } from 'vuex'
 	import StatusBar from '@/components/statusbar/statusbar.vue'
 	const list = [
 		{
@@ -37,18 +36,17 @@
 			}
 		},
 		beforeCreate() {
-			const username = getApp().globalData.username;
 			uni.request({
 				url: 'http://10.145.226.11:3000/log',
-				data: { username },
+				data: { username: '18361812729' },
 				method: 'GET',
 				success: (res) => {
 					if (res.data !== 'fail') {
-						this.initUserinfo(res.data);
-						this.getAvatar();
+						this.$store.commit('initUserinfo', res.data);
+						this.$store.dispatch('getAvatar');
 					}
 				}
-			})
+			});
 		},
 		components: {
 			StatusBar
@@ -58,9 +56,7 @@
 				uni.navigateTo({
 					url: '../log/log'
 				})
-			},
-			...mapMutations(['initUserinfo']),
-			...mapActions(['getAvatar', 'getCompanyinfo'])
+			}
 		}
 	}
 </script>

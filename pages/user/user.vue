@@ -3,21 +3,17 @@
 		<view class="user-top">
 			<view class="status-bar"></view>
 			<view class="camera">
-				<u-icon custom-prefix="custom-icon" name="icon" size="50" color="white"></u-icon>
+				<u-icon custom-prefix="custom-icon" name="icon" size="50" color="white" @click="takePhoto"></u-icon>
 			</view>
-			<!-- http://10.145.226.11:3000/img/avatar.jpeg -->
 			<view class="user-basic">
-				<u-avatar 
-					:src="avatar"
-					size="large" show-sex :sex-icon="gender"
-				>
+				<u-avatar :src="avatar" size="large" show-sex :sex-icon="gender">
 				</u-avatar>
 				<view class="text-name">
 					<p>{{nickname}}</p>
 					<p>{{name}}</p>
 				</view>
 			</view>
-			<view class="user-tips">
+			<view class="user-tips" @click="changeInfo('worker')">
 				<p>进行员工认证后才能管理信息噢！</p>
 				<u-icon name="Right" custom-prefix="custom-icon" size="50" color="white"></u-icon>
 			</view>
@@ -28,7 +24,7 @@
 				<p>{{item.text}}</p>
 			</view>
 			<view class="item-cell">
-				<u-button type="primary" size="medium">修改</u-button>
+				<u-button type="primary" size="medium" @click="changeInfo('change')">修改</u-button>
 			</view>
 		</view>
 		<view class="user-bot">
@@ -41,9 +37,11 @@
 </template>
 
 <script>
-	import {mapState, mapGetters} from 'vuex'
-	const infodata = [
-		{
+	import {
+		mapState,
+		mapGetters
+	} from 'vuex'
+	const infodata = [{
 			name: 'name',
 			text: '姓名'
 		},
@@ -82,104 +80,156 @@
 			};
 		},
 		computed: {
-			...mapState(['avatar', 'copyinfo']),
+			...mapState(['avatar', 'userinfo']),
 			...mapGetters(['name', 'nickname', 'gender'])
 		},
 		onHide() {
 			this.sight = false
 		},
 		methods: {
+			woker() {
+				console.log('dds')
+			},
 			show(val) {
 				let key;
-				switch(val.name) {
-					case 'name': key = 'name'; break
-					case 'yonghuming': key = 'username'; break
-					case 'age': key = 'age'; break
-					case 'Verifiedgender': key = 'sex'; break
-					case 'xiugainicheng': key = 'nickname'; break
-					case 'CompanyPages': key = 'company'; break
-					case 'Email': key = 'email'; break
-					default: break
+				switch (val.name) {
+					case 'name':
+						key = 'name';
+						break
+					case 'yonghuming':
+						key = 'username';
+						break
+					case 'age':
+						key = 'age';
+						break
+					case 'Verifiedgender':
+						key = 'sex';
+						break
+					case 'xiugainicheng':
+						key = 'nickname';
+						break
+					case 'CompanyPages':
+						key = 'company';
+						break
+					case 'Email':
+						key = 'email';
+						break
+					default:
+						break
 				}
 				this.title = val.text;
-				this.text = this.copyinfo[key];
+				this.text = this.userinfo[key];
 				this.sight = true;
 			},
 			logout() {
-				if(this.copyinfo.username) {
+				if (this.userinfo.username) {
 					uni.request({
-						
+						url: 'http://10.145.226.11:3000/log',
+						method: 'PUT',
+						data: {
+							username: this.userinfo.username
+						},
+						success: (res) => {
+							if (res.data === 'ok') {
+								uni.navigateTo({
+									url: '../log/log'
+								});
+								uni.showToast({
+									position: 'top',
+									title: '退出登录'
+								})
+							}
+						}
 					})
 				}
+			},
+			changeInfo(val) {
+				uni.navigateTo({
+					url: '../change/change?bool=' + val,
+					animationType: 'slide-in-bottom'
+				})
+			},
+			takePhoto() {
+				
 			}
 		}
 	}
 </script>
 
 <style lang="scss">
-#user {
-	width: 750rpx;
-	.user-top {
-		background-color: #5290FF;
-		padding-bottom: 80px;
-		color: white;
-		.status-bar {
-			height: var(--status-bar-height);
-		}
-		.camera {
-			display: flex;
-			justify-content: flex-end;
-			padding:0 20px;
-		}
-		.user-basic {
-			margin: 0 0 20px 0;
-			padding: 0 20px;
-			display: flex;
-			align-items: center;
-			.text-name {
-				margin-left: 20px;
+	#user {
+		width: 750rpx;
+
+		.user-top {
+			background-color: #5290FF;
+			padding-bottom: 80px;
+			color: white;
+
+			.status-bar {
+				height: var(--status-bar-height);
+			}
+
+			.camera {
+				display: flex;
+				justify-content: flex-end;
+				padding: 0 20px;
+			}
+
+			.user-basic {
+				margin: 0 0 20px 0;
+				padding: 0 20px;
+				display: flex;
+				align-items: center;
+
+				.text-name {
+					margin-left: 20px;
+				}
+			}
+
+			.user-tips {
+				margin: 0 20px;
+				padding-left: 10px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				border-radius: 5px;
+				background-color: #4281F0;
+				height: 40px;
 			}
 		}
-		.user-tips {
-			margin: 0 20px;
-			padding-left: 10px;
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			border-radius: 5px;
-			background-color: #4281F0;
-			height: 40px;
-		}
-	}
-	.user-mid {
-		width: 90%;
-		height: 400px;
-		background-color: white;
-		position: relative;
-		top: -50px;
-		margin: 0 auto;
-		padding: 10px;
-		border-radius: 10px;
-		box-shadow: 2px 2px 5px 2px #dfe6e9,
-								2px -2px 5px 2px #dfe6e9,
-								-2px 2px 5px 2px #dfe6e9,
-								-2px -2px 5px 2px #dfe6e9;
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		grid-template-rows: repeat(4, 1fr);
-		.item-cell {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			p {
-				margin-left: 10px;
+
+		.user-mid {
+			width: 90%;
+			height: 400px;
+			background-color: white;
+			position: relative;
+			top: -50px;
+			margin: 0 auto;
+			padding: 10px;
+			border-radius: 10px;
+			box-shadow: 2px 2px 5px 2px #dfe6e9,
+				2px -2px 5px 2px #dfe6e9,
+				-2px 2px 5px 2px #dfe6e9,
+				-2px -2px 5px 2px #dfe6e9;
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			grid-template-rows: repeat(4, 1fr);
+
+			.item-cell {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+
+				p {
+					margin-left: 10px;
+				}
 			}
 		}
+
+		.user-bot {
+			position: relative;
+			top: -30px;
+			text-align: center;
+		}
 	}
-	.user-bot {
-		position: relative;
-		top: -30px;
-		text-align: center;
-	}
-}
 </style>

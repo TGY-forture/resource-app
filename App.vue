@@ -1,8 +1,5 @@
 <script>
 export default {
-	globalData: {
-		username: '18361812729'
-	},
 	onLaunch: function() {
 		// console.log('App Launch');
 	},
