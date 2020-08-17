@@ -36,17 +36,20 @@
 			}
 		},
 		beforeCreate() {
-			uni.request({
-				url: 'http://10.145.226.11:3000/log',
-				data: { username: '18361812729' },
-				method: 'GET',
-				success: (res) => {
-					if (res.data !== 'fail') {
-						this.$store.commit('initUserinfo', res.data);
-						this.$store.dispatch('getAvatar');
+			const username = uni.getStorageSync('username');
+			if (username) {
+				uni.request({
+					url: 'http://10.145.226.11:3000/log',
+					data: { username },
+					method: 'GET',
+					success: (res) => {
+						if (res.data !== 'fail') {
+							this.$store.commit('initUserinfo', res.data);
+							this.$store.dispatch('getAvatar');
+						}
 					}
-				}
-			});
+				});
+			}
 		},
 		components: {
 			StatusBar

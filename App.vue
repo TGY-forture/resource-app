@@ -1,13 +1,16 @@
 <script>
 export default {
 	onLaunch: function() {
-		// console.log('App Launch');
-	},
-	onShow: function() {
-		// console.log('App Show');
-	},
-	onHide: function() {
-		// console.log('App Hide');
+		const username = uni.getStorageSync('username');
+		// if (username) {
+		// 	uni.switchTab({
+		// 		url: './pages/index/index'
+		// 	})
+		// } else {
+		// 	uni.navigateTo({
+		// 		url: './pages/log/log'
+		// 	})
+		// }
 	}
 };
 </script>

@@ -6,7 +6,7 @@
 				<u-icon custom-prefix="custom-icon" name="icon" size="50" color="white" @click="takePhoto"></u-icon>
 			</view>
 			<view class="user-basic">
-				<u-avatar :src="avatar" size="large" show-sex :sex-icon="gender">
+				<u-avatar :src="avatar" size="large" show-sex :sex-icon="gender" @click="changeAvatar">
 				</u-avatar>
 				<view class="text-name">
 					<p>{{nickname}}</p>
@@ -39,7 +39,8 @@
 <script>
 	import {
 		mapState,
-		mapGetters
+		mapGetters,
+		mapMutations
 	} from 'vuex'
 	const infodata = [{
 			name: 'name',
@@ -87,6 +88,7 @@
 			this.sight = false
 		},
 		methods: {
+			...mapMutations(['initAvatar']),
 			woker() {
 				console.log('dds')
 			},
@@ -131,6 +133,10 @@
 						},
 						success: (res) => {
 							if (res.data === 'ok') {
+								this.$store.commit('clearUserinfo');
+								uni.removeStorage({
+									key: 'username'
+								})
 								uni.navigateTo({
 									url: '../log/log'
 								});
@@ -144,13 +150,85 @@
 				}
 			},
 			changeInfo(val) {
+				if (!this.userinfo.username) {
+					uni.showToast({
+						title: '未登录',
+						icon: 'none'
+					})
+					return
+				}
 				uni.navigateTo({
 					url: '../change/change?bool=' + val,
 					animationType: 'slide-in-bottom'
 				})
 			},
 			takePhoto() {
-				
+				const camera = plus.camera.getCamera();
+				const res = camera.supportedImageResolutions[0];
+				const fmt = camera.supportedImageFormats[0];
+				camera.captureImage(
+					(path) => {
+						//转换成绝对路径才可以直接使用，上传不需要转换
+						const abpath = plus.io.convertLocalFileSystemURL(path); 
+						this.uploadImg(abpath);
+					},
+					(error) => {
+						console.log("Capture image failed: " + error.message);
+					}, {
+						resolution: res,
+						format: fmt
+					}
+				);
+			},
+			changeAvatar() {
+				uni.chooseImage({
+					count: 1,
+					sizeType: ['original'],
+					sourceType: ['album'],
+					success: (res) => {
+						const path = res.tempFilePaths;
+						this.uploadImg(path[0])
+					}
+				});
+			},
+			uploadImg(path) {
+				if (!this.userinfo.username) {
+					uni.showToast({
+						title: '未登录',
+						icon: 'none'
+					})
+					return
+				}
+				plus.io.getFileInfo({
+					filePath: path,
+					digestAlgorithm: 'md5',
+					success: ({size}) => {
+						if (size >= 1048576) {
+							uni.showToast({
+								title: '图片应小于1M',
+								position: 'top'
+							})
+						} else {
+							uni.uploadFile({
+								url: 'http://10.145.226.11:3000/user',
+								filePath: path,
+								name: 'avatar',
+								formData: {
+									username: this.userinfo.username
+								},
+								success: (uploadFileRes) => {
+									if (uploadFileRes.data === 'ok') {
+										this.initAvatar(path)
+										uni.showToast({
+											title: '上传成功',
+											icon: 'success'
+										})
+									}
+								}
+							});
+						}
+					}
+				})
 			}
 		}
 	}
