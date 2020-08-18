@@ -77,7 +77,7 @@
 						} else if (res.data === 'exist') {
 							uni.navigateTo({
 								url: '../record/record?exist=yes&seq=' + this.seq,
-								animationType: 'zoom-fade-out'
+								animationType: 'slide-in-left'
 							})
 						}
 					}
@@ -88,7 +88,7 @@
 				this.show = false
 				uni.navigateTo({
 					url: '../record/record?exist=no&seq=' + this.seq + '&batch=' + this.batch,
-					animationType: 'zoom-fade-out'
+					animationType: 'slide-in-left'
 				})
 			}
 		}

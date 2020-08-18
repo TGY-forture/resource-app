@@ -55,6 +55,7 @@
 </template>
 
 <script>
+	const moment = require('moment');
 	import {
 		mapActions,
 		mapState
@@ -192,7 +193,24 @@
 				this.showmenu = false;
 			},
 			createQrcode() {
-				
+				this.showmenu = false;
+				uni.request({
+					url: 'http://10.145.226.11:3000/record/add',
+					data: {
+						seq: this.seq,
+						name: this.companyinfo.proname,
+						date: moment(new Date()).format("YYYY-MM-DD"),
+						company: this.companyinfo.company
+					},
+					method: 'POST',
+					success: (res) => {
+						if (res.data === "ok" || res.data === "exist") {
+							uni.navigateTo({
+								url: '../saveimg/saveimg?seq=' + this.seq + '&company=' + this.companyinfo.company
+							})
+						}
+					}
+				})
 			},
 			subInfo() {
 				uni.request({
@@ -202,7 +220,6 @@
 						company: this.companyinfo.company
 					},
 					success: (res) => {
-						console.log(res.data)
 						if (res.data === 'ok') {
 							this.getFlashValue(this.seq);
 						} else {

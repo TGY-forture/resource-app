@@ -17,7 +17,7 @@
 			<u-icon name="arrow-rightward" color="white" size="70"></u-icon>
 		</view>
 		<view class="bot-mes">
-			<span>忘记密码</span>
+			<span @tap="getPass">忘记密码</span>
 			<span>|</span>
 			<span @tap="toSign">用户注册</span>
 		</view>
@@ -101,6 +101,12 @@
 				uni.navigateTo({
 					url: '../sign/sign'
 				});
+			},
+			getPass() {
+				uni.navigateTo({
+					url: '../pass/pass',
+					animationType: 'slide-in-left'
+				})
 			}
 		}
 	}

@@ -3,18 +3,18 @@
 		<view class="sea-top">
 			<view class="status-bar"></view>
 			<view class="content">
-				<u-icon name="Larrow" custom-prefix="custom-icon" size="50" color="white"></u-icon>
+				<u-icon name="Larrow" custom-prefix="custom-icon" size="50" color="white" @click="back"></u-icon>
 				<span>搜索结果</span>
 			</view>
 		</view>
 		<view class="sea-result">
-			<p style="font-size:18px">共找到20条数据：</p>
-			<view class="sea-items" v-for="i in 1" :key="i">
-				<view class="sea-single" v-for="(item, index) in label" :key="index">
-					<p style="color:#333">{{item}}</p>
-					<p style="font-size: 10px;">{{i}}</p>
+			<p style="font-size:18px">共找到{{length}}条数据</p>
+			<view class="sea-items" v-for="item in list" :key="item.id">
+				<view class="sea-single" v-for="(val, key) in label">
+					<p style="color:#333">{{val}}</p>
+					<p style="font-size: 10px;">{{item[key]}}</p>
 				</view>
-				<view class="spe" @tap="showDetail(i)">
+				<view class="spe" @tap="showDetail(item.seq, item.company)">
 					<p>详情</p>
 				</view>
 			</view>
@@ -22,9 +22,9 @@
 		<u-popup v-model="show" width="70%">
 			<view class="sea-pop">
 				<view style="height:var(--status-bar-height);margin-bottom: 20px;"></view>
-				<view class="detail-content">
-					<span class="lab">我是标签我是标签</span>
-					<span class="con">我是一些内容哈哈哈我是一些内容哈哈哈</span>
+				<view class="detail-content" v-for="(item, index) of lastdata" :key="index">
+					<span class="lab">{{item.name}}</span>
+					<span class="con">{{item.val}}</span>
 				</view>
 			</view>
 		</u-popup>
@@ -32,17 +32,95 @@
 </template>
 
 <script>
-	const label = ['产品名称', '产品编号', '产品批次', '所属公司', '出厂日期']
+	const label = {
+		name: '产品名称',
+		seq: '产品编号',
+		batch: '产品批次',
+		company: '所属公司',
+		date: '出厂日期'
+	}
 	export default {
 		data() {
 			return {
 				label,
-				show: false
+				show: false,
+				list: [],
+				basicinfo: {},
+				processinfo: {},
+				items: {}
 			};
 		},
+		computed: {
+			length() {
+				return this.list.length
+			},
+			process() {
+				let ret = [];
+				for (let key in this.processinfo) {
+					if (/^p/.test(key)) {
+						ret.push({
+							name: '第' + key.slice(-1) + '道工序',
+							val: this.processinfo[key]
+						})
+					}
+				}
+				return ret
+			},
+			detail() {
+				let val = [];
+				for (let key in this.items[0]) {
+					if (key !== 'seq' && key !== 'id' && key !== 'havedone' && key !== 'batch') {
+						val.push({
+							name: this.items[0][key],
+							val: this.items[1][key]
+						})
+					}
+				}
+				return val
+			},
+			lastdata() {
+				return this.process.concat(this.detail)
+			}
+		},
+		onLoad(opt) {
+			uni.showLoading({
+				title: '正在加载..'
+			});
+			uni.request({
+				url: 'http://10.145.226.11:3000/search',
+				data: {
+					seq: opt.seq
+				},
+				method: 'GET',
+				success: (res) => {
+					if (res.data !== 'fail') {
+						this.list = res.data
+						uni.hideLoading()
+					}
+				}
+			})
+		},
 		methods: {
-			showDetail(val) {
+			showDetail(seq, company) {
+				uni.request({
+					url: 'http://10.145.226.11:3000/search/data',
+					data: {
+						seq,
+						company
+					},
+					method: 'GET',
+					success: (res) => {
+						if (res.data !== 'fail') {
+							// this.basicinfo = res.data[0];
+							this.processinfo = res.data[1][0][0];
+							this.items = res.data[1][1];
+						}
+					}
+				})
 				this.show = true;
+			},
+			back() {
+				uni.navigateBack()
 			}
 		}
 	}

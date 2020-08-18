@@ -2,8 +2,7 @@
 	"easycom": {
 		"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
 	},
-	"pages": [
-		{
+	"pages": [{
 			"path": "pages/index/index"
 		},
 		{
@@ -25,9 +24,15 @@
 			"path": "pages/search/search"
 		},
 		{
-			"path" : "pages/change/change"
+			"path": "pages/change/change"
+		},
+		{
+			"path": "pages/saveimg/saveimg"
+		},
+		{
+			"path": "pages/pass/pass"
 		}
-    ],
+	],
 	"tabBar": {
 		"color": "#7A7E83",
 		"selectedColor": "#1296db",

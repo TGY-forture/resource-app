@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/TGY-forture/resource-app#readme",
   "dependencies": {
+    "moment": "^2.27.0",
     "uview-ui": "^1.6.0"
-  }
+  },
+  "devDependencies": {}
 }
