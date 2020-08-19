@@ -54,7 +54,7 @@
 					method: 'POST',
 					success: (res) => {
 						if (res.data !== 'fail') {
-							this.receivecode = res.data;
+							this.receivecode = res.data.toString();
 							uni.showToast({
 								title: '发送成功',
 								icon: 'success'
